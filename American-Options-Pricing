@@ -3,14 +3,21 @@
 ###################################################
 import numpy as np
 
-# Example parameters
-S = 50  # Initial stock price
-K = 50  # Strike price
-r = 0.05  # Risk-free interest rate
-T = 1  # Time to maturity
-sigma = 0.2  # Volatility
-option_type = 'call'  # Option type ('call' or 'put')
-n = 200  # Number of time steps
+def get_input(prompt, input_type):
+    while True:
+        try:
+            return input_type(input(prompt))
+        except ValueError:
+            print("Invalid input. Please enter a valid value.")
+
+# Prompt the user for input parameters
+S = get_input("Enter the initial stock price (S): ", float)
+K = get_input("Enter the strike price (K): ", float)
+r = get_input("Enter the risk-free interest rate (r): ", float)
+T = get_input("Enter the time to maturity in years (T): ", float)
+sigma = get_input("Enter the volatility (sigma): ", float)
+option_type = get_input("Enter the option type ('call' or 'put'): ", str).lower()
+n = get_input("Enter the number of time steps (n): ", int)
 
 def american_option_pricing(S, K, r, T, sigma, option_type, n):
     """Pricing American Options using Binomial Trees"""
