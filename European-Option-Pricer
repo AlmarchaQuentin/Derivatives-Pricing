@@ -1,6 +1,21 @@
 from scipy.stats import norm
 import math
 
+def get_input(prompt, input_type):
+    while True:
+        try:
+            return input_type(input(prompt))
+        except ValueError:
+            print("Invalid input. Please enter a valid value.")
+
+# Prompt the user for input parameters
+S = get_input("Enter the initial stock price (S): ", float)
+K = get_input("Enter the strike price (K): ", float)
+r = get_input("Enter the risk-free interest rate (r): ", float)
+T = get_input("Enter the time to maturity in years (T): ", float)
+sigma = get_input("Enter the volatility (sigma): ", float)
+option_type = get_input("Enter the option type ('call' or 'put'): ", str).lower()
+
 # Def --> Black-Scholes European Option Pricing:
 def black_scholes(S, K, T, r, sigma, option_type):
     d1 = (math.log(S/K) + (r + 0.5 * sigma**2) * T) / (sigma* math.sqrt(T))
@@ -12,3 +27,5 @@ def black_scholes(S, K, T, r, sigma, option_type):
         print('The Price of this Put is:',p_option_price)
     else:
         raise ValueError("Invalid option type. Use 'call' or 'put'.")
+
+print(black_scholes(S, K, T, r, sigma, option_type))
