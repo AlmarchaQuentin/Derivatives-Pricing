@@ -1,0 +1,91 @@
+###################################################
+"""Pricing American Options using Binomial Trees"""
+###################################################
+import numpy as np
+
+# Example parameters
+S = 50  # Initial stock price
+K = 50  # Strike price
+r = 0.05  # Risk-free interest rate
+T = 1  # Time to maturity
+sigma = 0.2  # Volatility
+option_type = 'call'  # Option type ('call' or 'put')
+n = 200  # Number of time steps
+
+def american_option_pricing(S, K, r, T, sigma, option_type, n):
+    """Pricing American Options using Binomial Trees"""
+    import numpy as np
+
+    delta_t = T/n
+    u = np.exp(sigma*np.sqrt(delta_t)) # Up factor
+    d = 1/u # Down factor
+    p = (np.exp(r*delta_t)-d)/(u-d) # Risk-neutral probability of up movement
+    q = 1-p # Risk-neutral probability of down movement
+
+    # Initialize the stock price tree
+    stock_price_tree = np.zeros((n+1, n+1))
+    stock_price_tree[0, 0] = S
+    for i in range(1, n+1):
+        stock_price_tree[i, 0] = stock_price_tree[i-1, 0]*u
+        for j in range(1, i+1):
+            stock_price_tree[i, j] = stock_price_tree[i-1, j-1]*d
+
+    # Initialize the option price tree
+    option_price_tree = np.zeros((n+1, n+1))
+    for j in range(n+1):
+        if option_type == 'call':
+            option_price_tree[n, j] = max(0, stock_price_tree[n, j]-K)
+        elif option_type == 'put':
+            option_price_tree[n, j] = max(0, K-stock_price_tree[n, j])
+
+    # Calculate the option price at each node
+    for i in range(n-1, -1, -1):
+        for j in range(i+1):
+            if option_type == 'call':
+                option_price_tree[i, j] = max(stock_price_tree[i, j]-K,
+                                              np.exp(-r*delta_t)*(p*option_price_tree[i+1, j]+q*option_price_tree[i+1, j+1]))
+            elif option_type == 'put':
+                option_price_tree[i, j] = max(K-stock_price_tree[i, j],
+                                              np.exp(-r*delta_t)*(p*option_price_tree[i+1, j]+q*option_price_tree[i+1, j+1]))
+
+    return option_price_tree[0, 0]
+
+call = american_option_pricing(S, K, r, T, sigma, 'call', n)
+put = american_option_pricing(S, K, r, T, sigma, 'put', n)
+
+print()
+print(f"The price of the American {option_type} option is: {call:.2f}")
+print()
+print(f"The price of the American {option_type} option is: {put:.2f}")
+print()
+
+# Put-Call Parity does not apply to American options
+# However there is a derivate of Put-Call Parity that can be used to check for arbitrage opportunities on American options
+# S0 - X  =< C - P =<  S0 - Xe-rT  
+
+put_call_parity = call + K*np.exp(-r*T) - put - S
+
+if put_call_parity != 0:
+    conclusion = "Put-Call Parity does not hold"
+else:
+    conclusion = "Put-Call Parity holds"
+
+if put_call_parity != 0:
+    if put_call_parity > 0:
+        arbitrage = "Arbitrage opportunity: Long put, long stock, short call"
+    else: 
+        arbitrage = "Arbitrage opportunity: Long call, short stock, short put"
+
+print()
+print(f"Put-Call Parity: {put_call_parity:.2f}. {conclusion}. {arbitrage}")
+print()
+
+if put_call_parity != 0:
+    if put_call_parity > 0:
+        cash_flow = [call, -put, -S]
+        sum_of_cf = cash_flow.sum()
+        
+    else:
+        cash_flow = [-call, put, S]
+        sum_of_cf = cash_flow.sum()
+        fv = sum_of_cf*np.exp(r*T)
