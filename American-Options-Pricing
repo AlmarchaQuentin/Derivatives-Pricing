@@ -58,34 +58,3 @@ print(f"The price of the American {option_type} option is: {call:.2f}")
 print()
 print(f"The price of the American {option_type} option is: {put:.2f}")
 print()
-
-# Put-Call Parity does not apply to American options
-# However there is a derivate of Put-Call Parity that can be used to check for arbitrage opportunities on American options
-# S0 - X  =< C - P =<  S0 - Xe-rT  
-
-put_call_parity = call + K*np.exp(-r*T) - put - S
-
-if put_call_parity != 0:
-    conclusion = "Put-Call Parity does not hold"
-else:
-    conclusion = "Put-Call Parity holds"
-
-if put_call_parity != 0:
-    if put_call_parity > 0:
-        arbitrage = "Arbitrage opportunity: Long put, long stock, short call"
-    else: 
-        arbitrage = "Arbitrage opportunity: Long call, short stock, short put"
-
-print()
-print(f"Put-Call Parity: {put_call_parity:.2f}. {conclusion}. {arbitrage}")
-print()
-
-if put_call_parity != 0:
-    if put_call_parity > 0:
-        cash_flow = [call, -put, -S]
-        sum_of_cf = cash_flow.sum()
-        
-    else:
-        cash_flow = [-call, put, S]
-        sum_of_cf = cash_flow.sum()
-        fv = sum_of_cf*np.exp(r*T)
