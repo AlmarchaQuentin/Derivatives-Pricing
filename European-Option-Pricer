@@ -28,4 +28,8 @@ def black_scholes(S, K, T, r, sigma, option_type):
     else:
         raise ValueError("Invalid option type. Use 'call' or 'put'.")
 
-print(black_scholes(S, K, T, r, sigma, option_type))
+european_option_pricer = black_scholes(S, K, T, r, sigma, option_type)
+
+print()
+print(f"The price of the european {option_type} @{K} is: {european_option_pricer:.2f}")
+print()
