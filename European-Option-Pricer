@@ -8,11 +8,13 @@ def get_input(prompt, input_type):
         except ValueError:
             print("Invalid input. Please enter a valid value.")
 
-# Prompt the user for input parameters
+#This will prompt the user for input parameters
 S = get_input("Enter the initial stock price (S): ", float)
 K = get_input("Enter the strike price (K): ", float)
 r = get_input("Enter the risk-free interest rate (r): ", float)
-T = get_input("Enter the time to maturity in years (T): ", float)
+maturity_date_str = get_input("Enter the date of the maturity (T) in format (dd/mm/yyyy): ", str)
+maturity_date = datetime.strptime(maturity_date_str, "%d/%m/%Y")
+T = (maturity_date - datetime.now()).days / 365.25
 sigma = get_input("Enter the volatility (sigma): ", float)
 option_type = get_input("Enter the option type ('call' or 'put'): ", str).lower()
 
